@@ -2,4 +2,11 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="screen_bg">#041531</color>
+    <color name="subtitle">#C5CEDB</color>
+    <color name="field_bg">#FFFFFF</color>
+    <color name="hint">#8E8E93</color>
+    <color name="input_text">#1C1C1E</color>
+    <color name="icon">#1A2233</color>
+    <color name="button_bg">#11244C</color>
 </resources>

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/screen_bg"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingTop="56dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="40dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fontFamily="@font/inter_bold"
+            android:includeFontPadding="false"
+            android:text="@string/titulo"
+            android:textColor="@color/white"
+            android:textSize="34sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:fontFamily="@font/inter_regular"
+            android:includeFontPadding="false"
+            android:text="@string/subtitulo"
+            android:textColor="@color/subtitle"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="88dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/bg_field"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_home" />
+
+            <EditText
+                android:id="@+id/etRua"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                app:fontFamily="@font/inter_regular"
+                android:gravity="center_vertical"
+                android:hint="@string/hint_rua"
+                android:imeOptions="actionNext"
+                android:inputType="textCapWords"
+                android:maxLines="1"
+                android:padding="0dp"
+                android:singleLine="true"
+                android:textColor="@color/input_text"
+                android:textColorHint="@color/hint"
+                android:textCursorDrawable="@drawable/cursor"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="88dp"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/bg_field"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_pin" />
+
+            <EditText
+                android:id="@+id/etNumero"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                app:fontFamily="@font/inter_regular"
+                android:gravity="center_vertical"
+                android:hint="@string/hint_numero"
+                android:imeOptions="actionNext"
+                android:inputType="number"
+                android:maxLines="1"
+                android:padding="0dp"
+                android:singleLine="true"
+                android:textColor="@color/input_text"
+                android:textColorHint="@color/hint"
+                android:textCursorDrawable="@drawable/cursor"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="88dp"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/bg_field"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_complemento" />
+
+            <EditText
+                android:id="@+id/etComplemento"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                app:fontFamily="@font/inter_regular"
+                android:gravity="center_vertical"
+                android:hint="@string/hint_complemento"
+                android:imeOptions="actionDone"
+                android:inputType="textCapSentences"
+                android:maxLines="1"
+                android:padding="0dp"
+                android:singleLine="true"
+                android:textColor="@color/input_text"
+                android:textColorHint="@color/hint"
+                android:textCursorDrawable="@drawable/cursor"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnCadastrar"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginTop="26dp"
+            android:background="@drawable/bg_button"
+            app:fontFamily="@font/inter_bold"
+            android:stateListAnimator="@null"
+            android:text="@string/btn_cadastrar"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:padding="0dp"
+            app:backgroundTint="@null" />
+
+    </LinearLayout>
+</ScrollView>

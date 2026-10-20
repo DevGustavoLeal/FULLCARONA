@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Fullcarona</string>
+    <string name="titulo">Passageiro</string>
+    <string name="subtitulo">Cadastrar endereço</string>
+    <string name="hint_rua">Rua, Avenida, etc.</string>
+    <string name="hint_numero">Número</string>
+    <string name="hint_complemento">Complemento (opcional)</string>
+    <string name="btn_cadastrar">Cadastrar</string>
+    <string name="erro_rua">Informe a rua.</string>
+    <string name="erro_numero">Informe o número.</string>
+    <string name="sucesso_endereco">Endereço cadastrado: %1$s</string>
 </resources>
