@@ -1,8 +1,0 @@
-<resources>
-    <string name="app_name">Você é?</string>
-    <string name="question">Você é?</string>
-    <string name="driver">Motorista</string>
-    <string name="passenger">Passageiro</string>
-    <string name="driver_selected">Motorista selecionado</string>
-    <string name="passenger_selected">Passageiro selecionado</string>
-</resources>
