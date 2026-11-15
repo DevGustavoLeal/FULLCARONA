@@ -14,7 +14,4 @@
 .cxx
 local.properties
 
-*.html
-work/
-build/
-outputs/
+.idea/
