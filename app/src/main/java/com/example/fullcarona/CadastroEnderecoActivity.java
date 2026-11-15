@@ -1,5 +1,6 @@
 package com.example.fullcarona;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -81,5 +82,8 @@ public class CadastroEnderecoActivity extends AppCompatActivity {
             endereco = endereco + " - " + complemento;
         }
         Toast.makeText(this, getString(R.string.sucesso_endereco, endereco), Toast.LENGTH_LONG).show();
+
+        startActivity(new Intent(this, HomePassageiroActivity.class));
+        finish();
     }
 }
