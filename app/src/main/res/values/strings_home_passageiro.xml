@@ -1,4 +1,16 @@
 <resources>
     <string name="home_titulo">Passageiro</string>
     <string name="home_subtitulo">Caronas disponíveis</string>
+    <string name="home_trajeto">%1$s → %2$s</string>
+    <string name="home_horario">Saída às %1$s</string>
+    <plurals name="home_vagas">
+        <item quantity="one">%d vaga</item>
+        <item quantity="other">%d vagas</item>
+    </plurals>
+    <string name="home_btn_solicitar">Solicitar</string>
+    <string name="home_btn_solicitado">Solicitado</string>
+    <string name="home_sem_caronas">Nenhuma carona disponível no momento.</string>
+    <string name="home_solicitacao_enviada">Carona solicitada! Aguarde o motorista aceitar.</string>
+    <string name="home_ja_solicitou">Você já solicitou esta carona.</string>
+    <string name="home_btn_minhas_caronas">Minhas caronas</string>
 </resources>
