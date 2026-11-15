@@ -29,6 +29,7 @@
             android:exported="false" />
 
         <activity android:name=".MinhasCaronasActivity" android:exported="false" />
+        <activity android:name=".HomePassageiroActivity" android:exported="false" />
     </application>
 
 </manifest>
