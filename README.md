@@ -116,3 +116,10 @@ Clique em Run (Shift + F10 ou no botão ▶️).
 📄 Licença
 
 Este projeto está sob a licença MIT. Consulte o arquivo LICENSE para obter mais detalhes.
+
+
+## Status do Desenvolvimento - Gustavo
+- [x] Estrutura da Sessao (SharedPreferences)
+- [x] Tela de Login (LoginActivity)
+- [x] Tela de Minhas Caronas (MinhasCaronasActivity + Adapter + Item Layout)
+- [ ] Integracao com o Banco de Dados Room (Aguardando Repositories do Pedro)
