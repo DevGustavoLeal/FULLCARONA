@@ -1,0 +1,215 @@
+package com.example.fullcarona;
+
+import android.app.Activity;
+
+import android.os.Bundle;
+
+import android.graphics.Color;
+
+import android.graphics.Typeface;
+
+import android.graphics.drawable.GradientDrawable;
+
+import android.view.Gravity;
+
+import android.view.ViewGroup;
+
+import android.widget.Button;
+
+import android.widget.EditText;
+
+import android.widget.LinearLayout;
+
+import android.widget.TextView;
+
+import android.widget.Toast;
+
+public class MainActivity extends Activity {
+
+    private EditText marca, placa, modeloAno;
+
+    @Override
+
+    protected void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+
+        LinearLayout tela = new LinearLayout(this);
+
+        tela.setOrientation(LinearLayout.VERTICAL);
+
+        tela.setPadding(28, 80, 28, 30);
+
+        tela.setBackgroundColor(Color.rgb(6, 26, 53));
+
+        TextView titulo = new TextView(this);
+
+        titulo.setText("Motorista");
+
+        titulo.setTextSize(40);
+
+        titulo.setTextColor(Color.WHITE);
+
+        titulo.setTypeface(null, Typeface.BOLD);
+
+        tela.addView(titulo);
+
+        TextView subtitulo = new TextView(this);
+
+        subtitulo.setText("Cadastrar veículo");
+
+        subtitulo.setTextSize(21);
+
+        subtitulo.setTextColor(Color.LTGRAY);
+
+        LinearLayout.LayoutParams subParams =
+
+                new LinearLayout.LayoutParams(-1, -2);
+
+        subParams.bottomMargin = 40;
+
+        tela.addView(subtitulo, subParams);
+
+        marca = criarCampo("Marca do veículo");
+
+        placa = criarCampo("Placa");
+
+        modeloAno = criarCampo("Modelo/Ano");
+
+        tela.addView(marca);
+
+        adicionarEspaco(tela, 18);
+
+        tela.addView(placa);
+
+        adicionarEspaco(tela, 18);
+
+        tela.addView(modeloAno);
+
+        adicionarEspaco(tela, 28);
+
+        Button cadastrar = new Button(this);
+
+        cadastrar.setText("Cadastrar");
+
+        cadastrar.setTextSize(19);
+
+        cadastrar.setTextColor(Color.WHITE);
+
+        cadastrar.setAllCaps(false);
+
+        cadastrar.setBackground(
+
+                fundo(Color.rgb(16, 45, 87), 12));
+
+        tela.addView(cadastrar, new LinearLayout.LayoutParams(
+
+                ViewGroup.LayoutParams.MATCH_PARENT, 64));
+
+        cadastrar.setOnClickListener(v -> {
+
+            String m = marca.getText().toString().trim();
+
+            String p = placa.getText().toString()
+
+                    .trim().toUpperCase();
+
+            String a = modeloAno.getText().toString().trim();
+
+            if (m.isEmpty()) {
+
+                marca.setError("Informe a marca");
+
+                return;
+
+            }
+
+            if (p.isEmpty()) {
+
+                placa.setError("Informe a placa");
+
+                return;
+
+            }
+
+            if (!p.matches("^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$")) {
+
+                placa.setError("Placa inválida");
+
+                return;
+
+            }
+
+            if (a.isEmpty()) {
+
+                modeloAno.setError("Informe o modelo/ano");
+
+                return;
+
+            }
+
+            Toast.makeText(this,
+
+                    "Veículo cadastrado com sucesso!",
+
+                    Toast.LENGTH_LONG).show();
+
+        });
+
+        setContentView(tela);
+
+    }
+
+    private EditText criarCampo(String dica) {
+
+        EditText campo = new EditText(this);
+
+        campo.setHint(dica);
+
+        campo.setTextSize(17);
+
+        campo.setSingleLine(true);
+
+        campo.setPadding(20, 8, 16, 8);
+
+        campo.setTextColor(Color.DKGRAY);
+
+        campo.setHintTextColor(Color.GRAY);
+
+        campo.setBackground(fundo(Color.WHITE, 12));
+
+        campo.setLayoutParams(new LinearLayout.LayoutParams(
+
+                ViewGroup.LayoutParams.MATCH_PARENT, 64));
+
+        return campo;
+
+    }
+
+    private GradientDrawable fundo(int cor, int raio) {
+
+        GradientDrawable drawable = new GradientDrawable();
+
+        drawable.setColor(cor);
+
+        drawable.setCornerRadius(raio * getResources()
+
+                .getDisplayMetrics().density);
+
+        return drawable;
+
+    }
+
+    private void adicionarEspaco(LinearLayout layout, int altura) {
+
+        TextView espaco = new TextView(this);
+
+        layout.addView(espaco, new LinearLayout.LayoutParams(
+
+                1, (int) (altura * getResources()
+
+                        .getDisplayMetrics().density)));
+
+    }
+
+}
