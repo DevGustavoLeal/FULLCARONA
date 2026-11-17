@@ -23,5 +23,14 @@
         <activity android:name=".HomePassageiroActivity" android:exported="false" />
         <activity android:name=".HomeMotoristaActivity" android:exported="false" />
         <activity android:name=".MinhasCaronasActivity" android:exported="false" />
+        <activity
+            android:name=".CadastroEnderecoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+
+        <activity android:name=".MinhasCaronasActivity" android:exported="false" />
+        <activity android:name=".HomePassageiroActivity" android:exported="false" />
     </application>
 </manifest>

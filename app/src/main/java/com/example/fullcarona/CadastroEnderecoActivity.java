@@ -1,5 +1,6 @@
 package com.example.fullcarona;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -96,5 +97,9 @@ public class CadastroEnderecoActivity extends AppCompatActivity {
         } catch (RuntimeException e) {
             Toast.makeText(this, "Não foi possível salvar o endereço.", Toast.LENGTH_LONG).show();
         }
+        Toast.makeText(this, getString(R.string.sucesso_endereco, endereco), Toast.LENGTH_LONG).show();
+
+        startActivity(new Intent(this, HomePassageiroActivity.class));
+        finish();
     }
 }
