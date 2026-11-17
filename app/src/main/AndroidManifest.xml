@@ -9,7 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Fullcarona">
-        <activity android:name=".MainActivity" android:exported="true" android:windowSoftInputMode="adjustResize">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -23,14 +26,5 @@
         <activity android:name=".HomePassageiroActivity" android:exported="false" />
         <activity android:name=".HomeMotoristaActivity" android:exported="false" />
         <activity android:name=".MinhasCaronasActivity" android:exported="false" />
-        <activity
-            android:name=".CadastroEnderecoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".LoginActivity"
-            android:exported="false" />
-
-        <activity android:name=".MinhasCaronasActivity" android:exported="false" />
-        <activity android:name=".HomePassageiroActivity" android:exported="false" />
     </application>
 </manifest>
