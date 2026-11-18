@@ -10,6 +10,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.fullcarona.data.AppDatabase;
+import com.example.fullcarona.data.Endereco;
+import com.example.fullcarona.data.EnderecoRepository;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -19,11 +23,14 @@ public class CadastroEnderecoActivity extends AppCompatActivity {
     private EditText etRua;
     private EditText etNumero;
     private EditText etComplemento;
+    private long usuarioId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         configurarBarras();
+        usuarioId = new Sessao(this).getUsuarioId();
+        if (usuarioId <= 0) { finish(); return; }
         setContentView(R.layout.activity_endereco);
 
         etRua = findViewById(R.id.etRua);
@@ -81,8 +88,15 @@ public class CadastroEnderecoActivity extends AppCompatActivity {
         if (!complemento.isEmpty()) {
             endereco = endereco + " - " + complemento;
         }
-        Toast.makeText(this, getString(R.string.sucesso_endereco, endereco), Toast.LENGTH_LONG).show();
+        try {
+            new EnderecoRepository(AppDatabase.getInstance(this).enderecoDao())
+                    .salvar(new Endereco(usuarioId, rua, numero, complemento));
+        } catch (RuntimeException e) {
+            Toast.makeText(this, R.string.erro_salvar_endereco, Toast.LENGTH_LONG).show();
+            return;
+        }
 
+        Toast.makeText(this, getString(R.string.sucesso_endereco, endereco), Toast.LENGTH_LONG).show();
         startActivity(new Intent(this, HomePassageiroActivity.class));
         finish();
     }
