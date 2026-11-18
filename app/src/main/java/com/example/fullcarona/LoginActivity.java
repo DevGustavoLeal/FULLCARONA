@@ -1,5 +1,6 @@
 package com.example.fullcarona;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
@@ -30,10 +31,6 @@ public class LoginActivity extends AppCompatActivity {
         edtSenha = findViewById(R.id.edtSenha);
         btnEntrar = findViewById(R.id.btnEntrar);
         txtEsqueciSenha = findViewById(R.id.txtEsqueciSenha);
-        edtEmail = findViewById(R.id.edtEmail);
-        edtSenha = findViewById(R.id.edtSenha);
-        btnEntrar = findViewById(R.id.btnEntrar);
-        txtEsqueciSenha = findViewById(R.id.txtEsqueciSenha);
 
         SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         edtEmail.setText(prefs.getString(KEY_EMAIL, ""));
@@ -59,6 +56,10 @@ public class LoginActivity extends AppCompatActivity {
                     .apply();
 
             Toast.makeText(this, "Login realizado!", Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(LoginActivity.this, CadastroEnderecoActivity.class);
+            startActivity(intent);
+            finish();
         });
 
         txtEsqueciSenha.setOnClickListener(v ->
