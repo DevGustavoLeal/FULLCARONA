@@ -9,4 +9,5 @@
     <string name="erro_rua">Informe a rua.</string>
     <string name="erro_numero">Informe o número.</string>
     <string name="sucesso_endereco">Endereço cadastrado: %1$s</string>
+    <string name="erro_salvar_endereco">Não foi possível salvar o endereço.</string>
 </resources>
