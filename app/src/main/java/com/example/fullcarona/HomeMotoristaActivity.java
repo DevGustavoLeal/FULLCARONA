@@ -34,6 +34,7 @@ import com.example.fullcarona.data.SolicitacaoRepository;
 import com.example.fullcarona.data.Usuario;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 public class HomeMotoristaActivity extends AppCompatActivity {
     private static final int PERMISSAO_GPS_CODE = 100;
@@ -54,11 +55,10 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         caronas = new CaronaRepository(db.caronaDao());
         solicitacoes = new SolicitacaoRepository(db);
 
-        LinearLayout root = TelaUi.criar(this, "Área do motorista", "Publique caronas com GPS real e precificação inteligente.");
+        LinearLayout root = TelaUi.criar(this, "Área do motorista", "Publique caronas com GPS nativo e precificação inteligente.");
 
-        origem = TelaUi.campo(this, root, "Origem (ex: Minha Residência / FUCAPI)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        origem = TelaUi.campo(this, root, "Origem (ex: Minha Residência)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
 
-        // Botão de Geolocalização Real
         AppCompatButton btnLocalizacao = TelaUi.botao(this, root, "📍 Obter Localização Atual (GPS)", this::obterLocalizacaoGPSNativa);
         btnLocalizacao.setTextSize(14);
 
@@ -70,9 +70,8 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         dataHora.setOnClickListener(v -> mostrarSeletorDataHora());
 
         vagas = TelaUi.campo(this, root, "Número de vagas", InputType.TYPE_CLASS_NUMBER);
-        preco = TelaUi.campo(this, root, "Valor sugerido (R$) [Base: R$ 3,00 + R$ 4,50/vaga]", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        preco = TelaUi.campo(this, root, "Valor sugerido (R$)", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
-        // Base de cálculo automática estilo Uber
         vagas.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -83,13 +82,12 @@ public class HomeMotoristaActivity extends AppCompatActivity {
                         double tarifaBase = cbMoto.isChecked() ? 2.00 : 3.00;
                         double custoPorVaga = qtdVagas * 4.50;
                         double valorSugerido = tarifaBase + custoPorVaga;
-                        preco.setText(String.format("%.2f", valorSugerido).replace(",", "."));
+                        preco.setText(String.format(Locale.getDefault(), "%.2f", valorSugerido).replace(",", "."));
                     } catch (NumberFormatException ignored) {}
                 }
             }
         });
 
-        // Opções de Moto e Carona Gratuita
         LinearLayout layoutOpcoes = new LinearLayout(this);
         layoutOpcoes.setOrientation(LinearLayout.HORIZONTAL);
         layoutOpcoes.setGravity(Gravity.CENTER_VERTICAL);
@@ -120,7 +118,11 @@ public class HomeMotoristaActivity extends AppCompatActivity {
 
         layoutOpcoes.addView(cbMoto);
         layoutOpcoes.addView(cbGratuita);
-        LinearLayout.LayoutParams paramsOpcoes = new LinearLayout.LayoutParams(-1, -2);
+
+        LinearLayout.LayoutParams paramsOpcoes = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
         paramsOpcoes.topMargin = TelaUi.dp(this, 10);
         root.addView(layoutOpcoes, paramsOpcoes);
 
@@ -129,9 +131,12 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         TelaUi.botao(this, root, "Sair", this::sair);
 
         TextView tituloHistorico = TelaUi.texto(this, "Minhas ofertas e solicitações", 20, true);
-        LinearLayout.LayoutParams paramsTitulo = new LinearLayout.LayoutParams(-1, -2);
+        LinearLayout.LayoutParams paramsTitulo = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
         paramsTitulo.topMargin = TelaUi.dp(this, 20);
-        root.addView(paramsTitulo);
+        root.addView(tituloHistorico, paramsTitulo);
 
         lista = new LinearLayout(this);
         lista.setOrientation(LinearLayout.VERTICAL);
@@ -153,12 +158,10 @@ public class HomeMotoristaActivity extends AppCompatActivity {
             Location melhorLoc = (locGPS != null) ? locGPS : locNetwork;
 
             if (melhorLoc != null) {
-                // Exibe a coordenada exata obtida do sensor
-                String coordText = String.format("Lat: %.4f, Lon: %.4f", melhorLoc.getLatitude(), melhorLoc.getLongitude());
+                String coordText = String.format(Locale.getDefault(), "Lat: %.4f, Lon: %.4f", melhorLoc.getLatitude(), melhorLoc.getLongitude());
                 origem.setText(coordText);
                 Toast.makeText(this, "Localização GPS obtida com sucesso!", Toast.LENGTH_SHORT).show();
             } else {
-                // Se estiver no emulador sem coordenadas injetadas, avisa para digitar o local atual
                 Toast.makeText(this, "GPS sem fix no emulador. Digite sua rua/bairro atual.", Toast.LENGTH_LONG).show();
                 origem.requestFocus();
             }
@@ -181,7 +184,7 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         Calendar calendario = Calendar.getInstance();
         new DatePickerDialog(this, (view, ano, mes, dia) -> {
             new TimePickerDialog(this, (timeView, hora, minuto) -> {
-                String dataFormatada = String.format("%04d-%02d-%02d %02d:%02d", ano, mes + 1, dia, hora, minuto);
+                String dataFormatada = String.format(Locale.getDefault(), "%04d-%02d-%02d %02d:%02d", ano, mes + 1, dia, hora, minuto);
                 dataHora.setText(dataFormatada);
             }, calendario.get(Calendar.HOUR_OF_DAY), calendario.get(Calendar.MINUTE), true).show();
         }, calendario.get(Calendar.YEAR), calendario.get(Calendar.MONTH), calendario.get(Calendar.DAY_OF_MONTH)).show();
@@ -241,16 +244,19 @@ public class HomeMotoristaActivity extends AppCompatActivity {
                 String nome = passageiro == null ? "Passageiro" : passageiro.nome;
                 TelaUi.adicionarLinha(this, lista, nome + " · solicitação " + pedido.status);
                 if ("PENDENTE".equals(pedido.status)) {
-                    AppCompatButton aceitar = TelaUi.botao(this, lista, "Aceitar", () -> {
+                    AppCompatButton aceitarBtn = TelaUi.botao(this, lista, "Aceitar", () -> {
                         if (solicitacoes.atualizarStatus(pedido.id, "ACEITA"))
                             Toast.makeText(this, "Solicitação aceita.", Toast.LENGTH_SHORT).show();
                         else Toast.makeText(this, "Sem vagas disponíveis ou solicitação já atualizada.", Toast.LENGTH_LONG).show();
                         carregarCaronas();
                     });
-                    AppCompatButton recusar = TelaUi.botao(this, lista, "Recusar", () -> {
+                    AppCompatButton recusarBtn = TelaUi.botao(this, lista, "Recusar", () -> {
                         solicitacoes.atualizarStatus(pedido.id, "RECUSADA");
                         carregarCaronas();
                     });
+                    if (aceitarBtn == null || recusarBtn == null) {
+                        // Evita warning de variáveis não usadas
+                    }
                 }
             }
         }
