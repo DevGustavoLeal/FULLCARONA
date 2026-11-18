@@ -46,7 +46,7 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         caronas = new CaronaRepository(db.caronaDao());
         solicitacoes = new SolicitacaoRepository(db);
 
-        LinearLayout root = TelaUi.criar(this, "Área do motorista", "Publique caronas com precificação inteligente e gestão rápida.");
+        LinearLayout root = TelaUi.criar(this, "Área do motorista", "Publique caronas acessíveis para alunos e gerencie pedidos.");
 
         origem = TelaUi.campo(this, root, "Origem (digite o local ou bairro)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         destino = TelaUi.campo(this, root, "Destino (ex: Armando Mendes)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
@@ -57,8 +57,9 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         dataHora.setOnClickListener(v -> mostrarSeletorDataHora());
 
         vagas = TelaUi.campo(this, root, "Número de vagas", InputType.TYPE_CLASS_NUMBER);
-        preco = TelaUi.campo(this, root, "Valor sugerido (R$) [Base: R$ 3,00 + R$ 4,50/vaga]", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        preco = TelaUi.campo(this, root, "Ajuda de custo sugerida (R$)", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
+        // Cálculo econômico voltado para alunos: R$ 1,50 base + R$ 1,50 por vaga
         vagas.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -66,8 +67,8 @@ public class HomeMotoristaActivity extends AppCompatActivity {
                 if (!cbGratuita.isChecked() && s.length() > 0) {
                     try {
                         int qtdVagas = Integer.parseInt(s.toString());
-                        double tarifaBase = cbMoto.isChecked() ? 2.00 : 3.00;
-                        double custoPorVaga = qtdVagas * 4.50;
+                        double tarifaBase = cbMoto.isChecked() ? 1.00 : 1.50;
+                        double custoPorVaga = qtdVagas * 1.50;
                         double valorSugerido = tarifaBase + custoPorVaga;
                         preco.setText(String.format(Locale.getDefault(), "%.2f", valorSugerido).replace(",", "."));
                     } catch (NumberFormatException ignored) {}
@@ -85,7 +86,7 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         cbMoto.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 vagas.setText("1");
-                preco.setText("6.00");
+                preco.setText("2.50");
             } else {
                 preco.setText("");
             }
