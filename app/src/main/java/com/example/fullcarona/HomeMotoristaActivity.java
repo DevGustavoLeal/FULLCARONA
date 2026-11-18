@@ -1,14 +1,9 @@
 package com.example.fullcarona;
 
-import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -20,11 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.example.fullcarona.data.AppDatabase;
 import com.example.fullcarona.data.Carona;
@@ -37,7 +29,6 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class HomeMotoristaActivity extends AppCompatActivity {
-    private static final int PERMISSAO_GPS_CODE = 100;
     private long usuarioId;
     private AppDatabase db;
     private CaronaRepository caronas;
@@ -55,13 +46,9 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         caronas = new CaronaRepository(db.caronaDao());
         solicitacoes = new SolicitacaoRepository(db);
 
-        LinearLayout root = TelaUi.criar(this, "Área do motorista", "Publique caronas com GPS nativo e precificação inteligente.");
+        LinearLayout root = TelaUi.criar(this, "Área do motorista", "Publique caronas com precificação inteligente e gestão rápida.");
 
-        origem = TelaUi.campo(this, root, "Origem (ex: Minha Residência)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-
-        AppCompatButton btnLocalizacao = TelaUi.botao(this, root, "📍 Obter Localização Atual (GPS)", this::obterLocalizacaoGPSNativa);
-        btnLocalizacao.setTextSize(14);
-
+        origem = TelaUi.campo(this, root, "Origem (digite o local ou bairro)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         destino = TelaUi.campo(this, root, "Destino (ex: Armando Mendes)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
 
         dataHora = TelaUi.campo(this, root, "Data e Hora (Toque para selecionar)", InputType.TYPE_NULL);
@@ -70,7 +57,7 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         dataHora.setOnClickListener(v -> mostrarSeletorDataHora());
 
         vagas = TelaUi.campo(this, root, "Número de vagas", InputType.TYPE_CLASS_NUMBER);
-        preco = TelaUi.campo(this, root, "Valor sugerido (R$)", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        preco = TelaUi.campo(this, root, "Valor sugerido (R$) [Base: R$ 3,00 + R$ 4,50/vaga]", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
         vagas.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -145,41 +132,6 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         carregarCaronas();
     }
 
-    private void obterLocalizacaoGPSNativa() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSAO_GPS_CODE);
-            return;
-        }
-
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (locationManager != null) {
-            Location locGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            Location locNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            Location melhorLoc = (locGPS != null) ? locGPS : locNetwork;
-
-            if (melhorLoc != null) {
-                String coordText = String.format(Locale.getDefault(), "Lat: %.4f, Lon: %.4f", melhorLoc.getLatitude(), melhorLoc.getLongitude());
-                origem.setText(coordText);
-                Toast.makeText(this, "Localização GPS obtida com sucesso!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "GPS sem fix no emulador. Digite sua rua/bairro atual.", Toast.LENGTH_LONG).show();
-                origem.requestFocus();
-            }
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSAO_GPS_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                obterLocalizacaoGPSNativa();
-            } else {
-                Toast.makeText(this, "Permissão de localização negada.", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
     private void mostrarSeletorDataHora() {
         Calendar calendario = Calendar.getInstance();
         new DatePickerDialog(this, (view, ano, mes, dia) -> {
@@ -191,6 +143,13 @@ public class HomeMotoristaActivity extends AppCompatActivity {
     }
 
     private void criarCarona() {
+        String origemTexto = origem.getText().toString().trim();
+        if (origemTexto.isEmpty()) {
+            origem.setError("Informe a origem da carona");
+            Toast.makeText(this, "Digite a origem da carona.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String horario = DataHoraUtil.normalizar(dataHora.getText().toString());
         int quantidade;
         try {
@@ -211,7 +170,7 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         }
 
         try {
-            caronas.criar(new Carona(usuarioId, origem.getText().toString().trim(),
+            caronas.criar(new Carona(usuarioId, origemTexto,
                     destino.getText().toString().trim(), horario, quantidade, "ABERTA"));
 
             origem.setText(""); destino.setText(""); dataHora.setText(""); vagas.setText(""); preco.setText("");
@@ -255,7 +214,7 @@ public class HomeMotoristaActivity extends AppCompatActivity {
                         carregarCaronas();
                     });
                     if (aceitarBtn == null || recusarBtn == null) {
-                        // Evita warning de variáveis não usadas
+                        // Mantém referência limpa
                     }
                 }
             }
