@@ -91,14 +91,12 @@ public class CadastroEnderecoActivity extends AppCompatActivity {
         try {
             new EnderecoRepository(AppDatabase.getInstance(this).enderecoDao())
                     .salvar(new Endereco(usuarioId, rua, numero, complemento));
-            Toast.makeText(this, "Endereço salvo!", Toast.LENGTH_SHORT).show();
-            startActivity(new android.content.Intent(this, HomePassageiroActivity.class));
-            finish();
         } catch (RuntimeException e) {
-            Toast.makeText(this, "Não foi possível salvar o endereço.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.erro_salvar_endereco, Toast.LENGTH_LONG).show();
+            return;
         }
-        Toast.makeText(this, getString(R.string.sucesso_endereco, endereco), Toast.LENGTH_LONG).show();
 
+        Toast.makeText(this, getString(R.string.sucesso_endereco, endereco), Toast.LENGTH_LONG).show();
         startActivity(new Intent(this, HomePassageiroActivity.class));
         finish();
     }
