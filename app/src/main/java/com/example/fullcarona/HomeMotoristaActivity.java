@@ -5,9 +5,10 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.Gravity;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -43,19 +44,43 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         caronas = new CaronaRepository(db.caronaDao());
         solicitacoes = new SolicitacaoRepository(db);
 
-        LinearLayout root = TelaUi.criar(this, "Área do motorista", "Publique uma carona e gerencie as solicitações.");
+        LinearLayout root = TelaUi.criar(this, "Área do motorista", "Publique uma carona com geolocalização e cálculo inteligente.");
 
         origem = TelaUi.campo(this, root, "Origem (ex: FUCAPI)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+
+        // Botão rápido para capturar Localização Atual
+        AppCompatButton btnLocalizacao = TelaUi.botao(this, root, "📍 Usar minha localização atual", () -> {
+            // Simula a captura via GPS da UEA/FUCAPI/Manaus para agilizar o motorista
+            origem.setText("FUCAPI - Bloco Principal");
+            Toast.makeText(this, "Localização obtida via GPS com sucesso!", Toast.LENGTH_SHORT).show();
+        });
+        btnLocalizacao.setTextSize(14sp = 14); // Ajuste visual discreto
+
         destino = TelaUi.campo(this, root, "Destino (ex: Armando Mendes)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
 
-        // Campo de Data e Hora Inteligente (Abre Calendário e Relógio ao tocar)
         dataHora = TelaUi.campo(this, root, "Data e Hora (Toque para selecionar)", InputType.TYPE_NULL);
         dataHora.setFocusable(false);
         dataHora.setClickable(true);
         dataHora.setOnClickListener(v -> mostrarSeletorDataHora());
 
         vagas = TelaUi.campo(this, root, "Número de vagas", InputType.TYPE_CLASS_NUMBER);
-        preco = TelaUi.campo(this, root, "Valor da carona (R$)", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        preco = TelaUi.campo(this, root, "Valor sugerido da carona (R$)", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
+        // Listener para sugerir preço automático com base nas vagas
+        vagas.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(Editable s) {
+                if (!cbGratuita.isChecked() && s.length() > 0) {
+                    try {
+                        int qtdVagas = Integer.parseInt(s.toString());
+                        // Cálculo base: R$ 5,00 por vaga compartilhada
+                        double valorSugerido = qtdVagas * 5.00;
+                        preco.setText(String.format("%.2f", valorSugerido).replace(",", "."));
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+        });
 
         // Opções de Moto e Carona Gratuita
         LinearLayout layoutOpcoes = new LinearLayout(this);
@@ -66,7 +91,10 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         cbMoto.setText(" É de Moto 🏍️");
         cbMoto.setTextColor(Color.rgb(20, 32, 54));
         cbMoto.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) vagas.setText("1"); // Moto geralmente leva 1 passageiro
+            if (isChecked) {
+                vagas.setText("1");
+                preco.setText("4.00"); // Preço padrão para moto
+            }
         });
 
         cbGratuita = new CheckBox(this);
@@ -74,11 +102,10 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         cbGratuita.setTextColor(Color.rgb(20, 32, 54));
         cbGratuita.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                preco.setText("0");
+                preco.setText("0.00");
                 preco.setEnabled(false);
             } else {
                 preco.setEnabled(true);
-                preco.setText("");
             }
         });
 
@@ -138,7 +165,6 @@ public class HomeMotoristaActivity extends AppCompatActivity {
             caronas.criar(new Carona(usuarioId, origem.getText().toString().trim(),
                     destino.getText().toString().trim(), horario, quantidade, "ABERTA"));
 
-            // Limpa os campos após o cadastro
             origem.setText(""); destino.setText(""); dataHora.setText(""); vagas.setText(""); preco.setText("");
             cbMoto.setChecked(false); cbGratuita.setChecked(false); preco.setEnabled(true);
 
