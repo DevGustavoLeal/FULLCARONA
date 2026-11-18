@@ -52,6 +52,11 @@ final class TelaUi {
         input.setHint(dica);
         input.setInputType(tipo);
         input.setTextSize(16);
+
+        // CORREÇÃO DE CONTRASTE: Texto digitado preto e hint em cinza escuro legível sobre o fundo branco
+        input.setTextColor(Color.rgb(20, 32, 54));
+        input.setHintTextColor(Color.rgb(130, 140, 155));
+
         input.setPadding(dp(activity, 12), dp(activity, 10), dp(activity, 12), dp(activity, 10));
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(Color.WHITE);

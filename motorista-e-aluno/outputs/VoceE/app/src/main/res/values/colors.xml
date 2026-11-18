@@ -3,4 +3,12 @@
     <color name="navy_background">#071B35</color>
     <color name="navy_text">#0A2342</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Cores obrigatórias para corrigir o contraste nos inputs das telas XML -->
+    <color name="input_text">#142036</color>
+    <color name="hint">#828C9B</color>
+
+    <!-- Cores de fundo e suporte para garantir legibilidade -->
+    <color name="screen_bg">#F5F7FB</color>
+    <color name="subtitle">#A0ABBA</color>
 </resources>
