@@ -50,11 +50,10 @@ public class HomeMotoristaActivity extends AppCompatActivity {
 
         // Botão rápido para capturar Localização Atual
         AppCompatButton btnLocalizacao = TelaUi.botao(this, root, "📍 Usar minha localização atual", () -> {
-            // Simula a captura via GPS da UEA/FUCAPI/Manaus para agilizar o motorista
             origem.setText("FUCAPI - Bloco Principal");
             Toast.makeText(this, "Localização obtida via GPS com sucesso!", Toast.LENGTH_SHORT).show();
         });
-        btnLocalizacao.setTextSize(14sp = 14); // Ajuste visual discreto
+        btnLocalizacao.setTextSize(14);
 
         destino = TelaUi.campo(this, root, "Destino (ex: Armando Mendes)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
 
@@ -74,7 +73,6 @@ public class HomeMotoristaActivity extends AppCompatActivity {
                 if (!cbGratuita.isChecked() && s.length() > 0) {
                     try {
                         int qtdVagas = Integer.parseInt(s.toString());
-                        // Cálculo base: R$ 5,00 por vaga compartilhada
                         double valorSugerido = qtdVagas * 5.00;
                         preco.setText(String.format("%.2f", valorSugerido).replace(",", "."));
                     } catch (NumberFormatException ignored) {}
@@ -93,7 +91,7 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         cbMoto.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 vagas.setText("1");
-                preco.setText("4.00"); // Preço padrão para moto
+                preco.setText("4.00");
             }
         });
 
