@@ -1,9 +1,14 @@
 package com.example.fullcarona;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -15,8 +20,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.fullcarona.data.AppDatabase;
 import com.example.fullcarona.data.Carona;
@@ -28,6 +36,7 @@ import com.example.fullcarona.data.Usuario;
 import java.util.Calendar;
 
 public class HomeMotoristaActivity extends AppCompatActivity {
+    private static final int PERMISSAO_GPS_CODE = 100;
     private long usuarioId;
     private AppDatabase db;
     private CaronaRepository caronas;
@@ -40,19 +49,17 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         usuarioId = new Sessao(this).getUsuarioId();
         if (usuarioId <= 0) { finish(); return; }
+
         db = AppDatabase.getInstance(this);
         caronas = new CaronaRepository(db.caronaDao());
         solicitacoes = new SolicitacaoRepository(db);
 
-        LinearLayout root = TelaUi.criar(this, "Área do motorista", "Publique uma carona com geolocalização e cálculo inteligente.");
+        LinearLayout root = TelaUi.criar(this, "Área do motorista", "Publique caronas com GPS real e precificação inteligente.");
 
-        origem = TelaUi.campo(this, root, "Origem (ex: FUCAPI)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        origem = TelaUi.campo(this, root, "Origem (ex: Minha Residência / FUCAPI)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
 
-        // Botão rápido para capturar Localização Atual
-        AppCompatButton btnLocalizacao = TelaUi.botao(this, root, "📍 Usar minha localização atual", () -> {
-            origem.setText("FUCAPI - Bloco Principal");
-            Toast.makeText(this, "Localização obtida via GPS com sucesso!", Toast.LENGTH_SHORT).show();
-        });
+        // Botão de Geolocalização Real
+        AppCompatButton btnLocalizacao = TelaUi.botao(this, root, "📍 Obter Localização Atual (GPS)", this::obterLocalizacaoGPSNativa);
         btnLocalizacao.setTextSize(14);
 
         destino = TelaUi.campo(this, root, "Destino (ex: Armando Mendes)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
@@ -63,9 +70,9 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         dataHora.setOnClickListener(v -> mostrarSeletorDataHora());
 
         vagas = TelaUi.campo(this, root, "Número de vagas", InputType.TYPE_CLASS_NUMBER);
-        preco = TelaUi.campo(this, root, "Valor sugerido da carona (R$)", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        preco = TelaUi.campo(this, root, "Valor sugerido (R$) [Base: R$ 3,00 + R$ 4,50/vaga]", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
-        // Listener para sugerir preço automático com base nas vagas
+        // Base de cálculo automática estilo Uber
         vagas.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -73,7 +80,9 @@ public class HomeMotoristaActivity extends AppCompatActivity {
                 if (!cbGratuita.isChecked() && s.length() > 0) {
                     try {
                         int qtdVagas = Integer.parseInt(s.toString());
-                        double valorSugerido = qtdVagas * 5.00;
+                        double tarifaBase = cbMoto.isChecked() ? 2.00 : 3.00;
+                        double custoPorVaga = qtdVagas * 4.50;
+                        double valorSugerido = tarifaBase + custoPorVaga;
                         preco.setText(String.format("%.2f", valorSugerido).replace(",", "."));
                     } catch (NumberFormatException ignored) {}
                 }
@@ -91,7 +100,9 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         cbMoto.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 vagas.setText("1");
-                preco.setText("4.00");
+                preco.setText("6.00");
+            } else {
+                preco.setText("");
             }
         });
 
@@ -120,13 +131,50 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         TextView tituloHistorico = TelaUi.texto(this, "Minhas ofertas e solicitações", 20, true);
         LinearLayout.LayoutParams paramsTitulo = new LinearLayout.LayoutParams(-1, -2);
         paramsTitulo.topMargin = TelaUi.dp(this, 20);
-        root.addView(tituloHistorico, paramsTitulo);
+        root.addView(paramsTitulo);
 
         lista = new LinearLayout(this);
         lista.setOrientation(LinearLayout.VERTICAL);
         root.addView(lista);
 
         carregarCaronas();
+    }
+
+    private void obterLocalizacaoGPSNativa() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSAO_GPS_CODE);
+            return;
+        }
+
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (locationManager != null) {
+            Location locGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location locNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            Location melhorLoc = (locGPS != null) ? locGPS : locNetwork;
+
+            if (melhorLoc != null) {
+                // Exibe a coordenada exata obtida do sensor
+                String coordText = String.format("Lat: %.4f, Lon: %.4f", melhorLoc.getLatitude(), melhorLoc.getLongitude());
+                origem.setText(coordText);
+                Toast.makeText(this, "Localização GPS obtida com sucesso!", Toast.LENGTH_SHORT).show();
+            } else {
+                // Se estiver no emulador sem coordenadas injetadas, avisa para digitar o local atual
+                Toast.makeText(this, "GPS sem fix no emulador. Digite sua rua/bairro atual.", Toast.LENGTH_LONG).show();
+                origem.requestFocus();
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSAO_GPS_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                obterLocalizacaoGPSNativa();
+            } else {
+                Toast.makeText(this, "Permissão de localização negada.", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void mostrarSeletorDataHora() {
