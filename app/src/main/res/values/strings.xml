@@ -9,4 +9,7 @@
     <string name="erro_rua">Informe a rua.</string>
     <string name="erro_numero">Informe o número.</string>
     <string name="sucesso_endereco">Endereço cadastrado: %1$s</string>
+    <string name="perfil_pergunta">Você é?</string>
+    <string name="perfil_motorista">Motorista</string>
+    <string name="perfil_passageiro">Passageiro</string>
 </resources>
