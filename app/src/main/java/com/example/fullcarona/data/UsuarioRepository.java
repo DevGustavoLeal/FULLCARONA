@@ -1,7 +1,5 @@
 package com.example.fullcarona.data;
 
-import androidx.room.RoomDatabase;
-
 public class UsuarioRepository {
     private final AppDatabase db;
     public UsuarioRepository(AppDatabase db) { this.db = db; }
