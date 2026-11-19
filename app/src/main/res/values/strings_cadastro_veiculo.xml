@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Vai em: app/src/main/res/values/strings_cadastro_veiculo.xml
+     (arquivo separado, igual ao strings_home_passageiro.xml, para não dar conflito no strings.xml) -->
+<resources>
+    <string name="veiculo_titulo">Motorista</string>
+    <string name="veiculo_subtitulo">Cadastrar veículo</string>
+    <string name="veiculo_hint_marca">Marca (ex: Volkswagen)</string>
+    <string name="veiculo_hint_placa">Placa (ex: ABC1D23)</string>
+    <string name="veiculo_hint_modelo_ano">Modelo e ano (ex: Gol 2018)</string>
+    <string name="veiculo_btn_cadastrar">Cadastrar</string>
+    <string name="veiculo_erro_marca">Informe a marca.</string>
+    <string name="veiculo_erro_placa">Informe a placa.</string>
+    <string name="veiculo_erro_placa_formato">Placa inválida. Use ABC1234 ou ABC1D23.</string>
+    <string name="veiculo_erro_modelo_ano">Informe o modelo e o ano.</string>
+    <string name="veiculo_erro_salvar">Não foi possível salvar. A placa pode já estar cadastrada.</string>
+    <string name="veiculo_sucesso">Veículo cadastrado: %1$s</string>
+</resources>
