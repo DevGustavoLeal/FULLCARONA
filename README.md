@@ -1,131 +1,60 @@
 # FullCarona
 
-Aplicativo Android Java com Room/SQLite local. O fluxo implementado cobre criação de conta, login, escolha de perfil, endereço do passageiro, veículo do motorista, oferta e solicitação de caronas, decisão do motorista e histórico dos dois perfis.
+Aplicativo Android nativo em Java com banco de dados local Room/SQLite voltado para caronas universitárias acessíveis. O fluxo implementado cobre criação de conta, autenticação segura, escolha de perfil, endereço do passageiro, veículo do motorista, oferta e solicitação de caronas, decisão do motorista e acompanhamento de rotas.
 
-## Executar
+## Funcionalidades Implementadas
 
-Abra a pasta do projeto no Android Studio, sincronize o Gradle e execute a configuração `app` em um emulador ou dispositivo.
+### Para Passageiros
+- **Busca de Caronas:** Visualização de caronas abertas com origem, destino, data/hora e vagas disponíveis.
+- **Filtro e Solicitação:** Filtragem por origem/destino e reserva de vaga com atualização em tempo real.
+- **Minhas Caronas:** Acompanhamento do status das solicitações e atalho direto para abrir a rota de origem até o destino no mapa.
 
-## Dados de demonstração
+### Para Motoristas
+- **Oferta de Carona:** Cadastro de trajetos com origem livre, destino, seletor nativo de data e hora (`DatePickerDialog` e `TimePickerDialog`) e controle de vagas.
+- **Modalidades e Custo Estudantil:** Opções para **Moto** (1 vaga, sugestão de R$ 2,50), **Carona Gratuita** (R$ 0,00) ou **Carro** com sugestão acessível (R$ 1,50 base + R$ 1,50 por vaga).
+- **Gestão de Solicitações:** Aceite ou recusa de pedidos pendentes e encerramento automático como `LOTADA` ao preencher a última vaga.
+- **Minhas Caronas:** Visualização unificada de solicitações pendentes, caronas aceitas e botão de atalho para rota origem -> destino.
 
-Na primeira criação do banco local, o app inclui contas e três caronas futuras para facilitar a demonstração:
+## Tecnologias Utilizadas
 
-- Motorista: `motorista@fullcarona.app` / `Motorista123`
-- Passageiro: `passageiro@fullcarona.app` / `Passageiro123`
+- **Linguagem:** Java (JDK 17+)
+- **IDE:** Android Studio
+- **Persistência Local:** Room / SQLite (`Usuario`, `Endereco`, `Veiculo`, `Carona`, `Solicitacao`) com DAOs e Repositories
+- **Sessão e Segurança:** `SharedPreferences` (`Sessao`) e hash de senha com `PBKDF2-HMAC-SHA256` com salt
+- **Interface:** Telas programáticas com componentes nativos Android (`TelaUi`, `AppCompatActivity`, `DatePickerDialog`, `TimePickerDialog`)
 
-Contas novas podem ser criadas pela tela de login. A senha é armazenada usando PBKDF2-HMAC-SHA256 com salt. A sessão guarda apenas o ID do usuário. Dados ficam no dispositivo e não são sincronizados entre aparelhos.
+## Dados de Demonstração
 
-## Fluxos
+Na primeira criação do banco local, o app inclui contas e três caronas futuras para facilitar os testes:
 
-- Início → Entrar → Login ou Criar conta.
-- Após login, contas sem perfil escolhem Passageiro ou Motorista.
-- Passageiro cadastra endereço, vê caronas abertas, filtra por origem/destino e solicita uma vaga.
-- Motorista cadastra veículo, publica carona e aceita ou recusa solicitações. A última vaga aceita fecha a carona como `LOTADA`.
-- Minhas caronas mostra ofertas do motorista ou solicitações do passageiro com status.
+- **Motorista:** `motorista@fullcarona.app` / `Motorista123`
+- **Passageiro:** `passageiro@fullcarona.app` / `Passageiro123`
 
-## Banco
+Contas novas podem ser criadas pela tela de login. Os dados ficam armazenados localmente no dispositivo.
 
-Room contém `Usuario`, `Endereco`, `Veiculo`, `Carona` e `Solicitacao`, com DAOs e repositories separados. Operações são locais e síncronas para esta demonstração; o Room permite chamadas na thread principal. O banco usa fallback destrutivo durante mudanças de esquema de desenvolvimento, então a atualização do esquema pode apagar os dados locais existentes.
+## Fluxos do Aplicativo
+
+1. **Início -> Entrar:** Login ou criação de nova conta.
+2. **Seleção de Perfil:** Contas novas escolhem entre Passageiro ou Motorista.
+3. **Fluxo Passageiro:** Cadastra endereço, filtra caronas abertas, solicita vaga e acompanha em **Minhas Caronas**.
+4. **Fluxo Motorista:** Cadastra veículo, publica carona (carro, moto ou gratuita), aceita/recusa solicitações e abre a rota em **Minhas Caronas**.
+
+## Como Executar
+
+1. Clone o repositório e abra a pasta do projeto no Android Studio (Hedgehog ou superior).
+2. Aguarde a sincronização automática do Gradle.
+3. Selecione um emulador Android ou dispositivo físico com Depuração USB ativada.
+4. Execute a configuração `app` clicando em **Run (`▶`)** ou pressionando `Shift + F10`.
+
+## Status do Desenvolvimento
+
+- [x] Estrutura de Sessão (`SharedPreferences`) e autenticação com hash
+- [x] Tela de Login e Cadastro (`LoginActivity`)
+- [x] Banco de Dados Local Room, DAOs e Repositories
+- [x] Área do Motorista com seletor de data/hora, moto, carona gratuita e cálculo estudantil (`HomeMotoristaActivity`)
+- [x] Gestão de solicitações pendentes, aceitas e atalho de rota (`MinhasCaronasActivity`)
+- [ ] Integração com API REST externa e sincronização em nuvem (próxima etapa)
 
 ## Licença
 
-Este projeto está sob a licença MIT. Consulte o arquivo LICENSE para os termos completos.
-✨ Funcionalidades
-
-🔹 Para Passageiros
-
-Busca de Caronas: Visualização de caronas disponíveis com origem, destino, horário e preço.
-
-Detalhes da Viagem: Consulta de vagas restantes e valor individual por assento.
-
-Reserva de Vagas: Solicitação de confirmação para entrar na carona.
-
-🔹 Para Motoristas
-
-Oferecer Carona: Cadastro de rotas informando local de partida, destino, horário e assentos livres.
-
-Gerenciamento de Vagas: Controle em tempo real do número de assentos disponíveis.
-
-🛠️ Tecnologias Utilizadas
-
-Linguagem: Java (JDK 17+)
-
-IDE: Android Studio
-
-Interface de Usuário: Layouts nativos em XML (Material Design 3)
-
-Componentes Nativos:
-
-RecyclerView + CardView (Listagem otimizada de caronas)
-
-ExtendedFloatingActionButton (Ações rápidas)
-
-AppCompatActivity
-
-📂 Estrutura do Projeto
-
-app/src/main/
-├── java/com/exemplo/fullcarona/
-│   ├── MainActivity.java      # Activity principal com a listagem de caronas
-│   ├── CaronaAdapter.java     # Adaptador para o RecyclerView
-│   └── Carona.java            # Modelo de Dados (POJO)
-└── res/layout/
-    ├── activity_main.xml      # Layout principal da tela de caronas
-    └── item_carona.xml        # Layout individual dos cartões da lista
-
-
-⚙️ Pré-requisitos
-
-Antes de começar, certifique-se de ter instalado em sua máquina:
-
-Android Studio (Versão Hedgehog ou superior recomendada)
-
-Java Development Kit (JDK 17 ou superior)
-
-Um emulador Android ou dispositivo físico com Depuração USB ativada.
-
-🚀 Como Executar o Projeto
-
-Clonar o Repositório:
-
-git clone https://github.com/seu-usuario/full-carona.git
-
-
-Abrir no Android Studio:
-
-Abra o Android Studio.
-
-Selecione Open e escolha a pasta clonada do projeto.
-
-Sincronizar Dependências:
-
-Aguarde o Gradle sincronizar as dependências do projeto automaticamente.
-
-Executar a Aplicação:
-
-Selecione o dispositivo ou emulador desejado.
-
-Clique em Run (Shift + F10 ou no botão ▶️).
-
-🗺️ Próximos Passos & Roadmap
-
-[ ] Tela de Login e Cadastro de Usuários.
-
-[ ] Integração com Google Maps API para exibição de rotas no mapa.
-
-[ ] Conexão com backend via Retrofit (API REST em Node.js / Firebase).
-
-[ ] Sistema de avaliações entre passageiros e motoristas.
-
-[ ] Chat interno em tempo real.
-
-📄 Licença
-
-Este projeto está sob a licença MIT. Consulte o arquivo LICENSE para obter mais detalhes.
-
-
-## Status do Desenvolvimento - Gustavo
-- [x] Estrutura da Sessao (SharedPreferences)
-- [x] Tela de Login (LoginActivity)
-- [x] Tela de Minhas Caronas (MinhasCaronasActivity + Adapter + Item Layout)
-- [ ] Integracao com o Banco de Dados Room (Aguardando Repositories do Pedro)
+Este projeto está sob a licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
