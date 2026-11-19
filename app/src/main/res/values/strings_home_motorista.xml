@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Vai em: app/src/main/res/values/strings_home_motorista.xml -->
+<resources>
+    <string name="motorista_titulo">Área do motorista</string>
+    <string name="motorista_subtitulo">Publique caronas acessíveis para alunos e gerencie pedidos.</string>
+    <string name="motorista_hint_origem">Origem (digite o local ou bairro)</string>
+    <string name="motorista_hint_destino">Destino (ex: Armando Mendes)</string>
+    <string name="motorista_hint_data_hora">Data e hora (toque para selecionar)</string>
+    <string name="motorista_hint_vagas">Número de vagas</string>
+    <string name="motorista_hint_preco">Ajuda de custo sugerida (R$)</string>
+    <string name="motorista_cb_moto">É de moto 🏍️</string>
+    <string name="motorista_cb_gratuita">Carona gratuita 🤝</string>
+    <string name="motorista_btn_oferecer">Oferecer carona</string>
+    <string name="motorista_btn_minhas">Minhas caronas</string>
+    <string name="motorista_btn_sair">Sair</string>
+    <string name="motorista_secao">Minhas ofertas e solicitações</string>
+    <string name="motorista_vazio">Você ainda não ofereceu nenhuma carona.</string>
+</resources>

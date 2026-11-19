@@ -1,3 +1,6 @@
+// Vai em: app/src/main/java/com/example/fullcarona/HomeMotoristaActivity.java
+// (SUBSTITUI o arquivo que já existe na main). A lógica é a mesma de antes;
+// só a parte visual saiu do código e foi para o activity_home_motorista.xml.
 package com.example.fullcarona;
 
 import android.app.DatePickerDialog;
@@ -6,9 +9,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
-import android.view.Gravity;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -17,6 +19,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.example.fullcarona.data.AppDatabase;
 import com.example.fullcarona.data.Carona;
@@ -36,6 +40,7 @@ public class HomeMotoristaActivity extends AppCompatActivity {
     private EditText origem, destino, dataHora, vagas, preco;
     private CheckBox cbMoto, cbGratuita;
     private LinearLayout lista;
+    private TextView tvVazio;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,18 +51,20 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         caronas = new CaronaRepository(db.caronaDao());
         solicitacoes = new SolicitacaoRepository(db);
 
-        LinearLayout root = TelaUi.criar(this, "Área do motorista", "Publique caronas acessíveis para alunos e gerencie pedidos.");
+        configurarBarras();
+        setContentView(R.layout.activity_home_motorista);
 
-        origem = TelaUi.campo(this, root, "Origem (digite o local ou bairro)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-        destino = TelaUi.campo(this, root, "Destino (ex: Armando Mendes)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        origem = findViewById(R.id.etOrigem);
+        destino = findViewById(R.id.etDestino);
+        dataHora = findViewById(R.id.etDataHora);
+        vagas = findViewById(R.id.etVagas);
+        preco = findViewById(R.id.etPreco);
+        cbMoto = findViewById(R.id.cbMoto);
+        cbGratuita = findViewById(R.id.cbGratuita);
+        lista = findViewById(R.id.lista);
+        tvVazio = findViewById(R.id.tvVazio);
 
-        dataHora = TelaUi.campo(this, root, "Data e Hora (Toque para selecionar)", InputType.TYPE_NULL);
-        dataHora.setFocusable(false);
-        dataHora.setClickable(true);
         dataHora.setOnClickListener(v -> mostrarSeletorDataHora());
-
-        vagas = TelaUi.campo(this, root, "Número de vagas", InputType.TYPE_CLASS_NUMBER);
-        preco = TelaUi.campo(this, root, "Ajuda de custo sugerida (R$)", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
         // Cálculo econômico voltado para alunos: R$ 1,50 base + R$ 1,50 por vaga
         vagas.addTextChangedListener(new TextWatcher() {
@@ -76,13 +83,6 @@ public class HomeMotoristaActivity extends AppCompatActivity {
             }
         });
 
-        LinearLayout layoutOpcoes = new LinearLayout(this);
-        layoutOpcoes.setOrientation(LinearLayout.HORIZONTAL);
-        layoutOpcoes.setGravity(Gravity.CENTER_VERTICAL);
-
-        cbMoto = new CheckBox(this);
-        cbMoto.setText(" É de Moto 🏍️");
-        cbMoto.setTextColor(Color.rgb(20, 32, 54));
         cbMoto.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 vagas.setText("1");
@@ -92,9 +92,6 @@ public class HomeMotoristaActivity extends AppCompatActivity {
             }
         });
 
-        cbGratuita = new CheckBox(this);
-        cbGratuita.setText(" Carona Gratuita 🤝");
-        cbGratuita.setTextColor(Color.rgb(20, 32, 54));
         cbGratuita.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 preco.setText("0.00");
@@ -104,33 +101,31 @@ public class HomeMotoristaActivity extends AppCompatActivity {
             }
         });
 
-        layoutOpcoes.addView(cbMoto);
-        layoutOpcoes.addView(cbGratuita);
-
-        LinearLayout.LayoutParams paramsOpcoes = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        paramsOpcoes.topMargin = TelaUi.dp(this, 10);
-        root.addView(layoutOpcoes, paramsOpcoes);
-
-        TelaUi.botao(this, root, "Oferecer carona", this::criarCarona);
-        TelaUi.botao(this, root, "Minhas caronas", () -> startActivity(new Intent(this, MinhasCaronasActivity.class)));
-        TelaUi.botao(this, root, "Sair", this::sair);
-
-        TextView tituloHistorico = TelaUi.texto(this, "Minhas ofertas e solicitações", 20, true);
-        LinearLayout.LayoutParams paramsTitulo = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        paramsTitulo.topMargin = TelaUi.dp(this, 20);
-        root.addView(tituloHistorico, paramsTitulo);
-
-        lista = new LinearLayout(this);
-        lista.setOrientation(LinearLayout.VERTICAL);
-        root.addView(lista);
+        configurarBotao(R.id.btnOferecer, this::criarCarona);
+        configurarBotao(R.id.btnMinhasCaronas,
+                () -> startActivity(new Intent(this, MinhasCaronasActivity.class)));
+        configurarBotao(R.id.btnSair, this::sair);
 
         carregarCaronas();
+    }
+
+    private void configurarBotao(int id, Runnable acao) {
+        AppCompatButton botao = findViewById(id);
+        botao.setBackgroundResource(R.drawable.bg_button);
+        botao.setBackgroundTintList(null);
+        botao.setAllCaps(false);
+        botao.setOnClickListener(v -> acao.run());
+    }
+
+    private void configurarBarras() {
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+        int navy = Color.parseColor("#041531");
+        getWindow().setStatusBarColor(navy);
+        getWindow().setNavigationBarColor(navy);
+        WindowInsetsControllerCompat controller =
+                new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+        controller.setAppearanceLightStatusBars(false);
+        controller.setAppearanceLightNavigationBars(false);
     }
 
     private void mostrarSeletorDataHora() {
@@ -189,7 +184,9 @@ public class HomeMotoristaActivity extends AppCompatActivity {
     private void carregarCaronas() {
         if (lista == null) return;
         lista.removeAllViews();
+        boolean temCaronas = false;
         for (Carona carona : caronas.listarDoMotorista(usuarioId)) {
+            temCaronas = true;
             TelaUi.adicionarLinha(this, lista, carona.origem + " → " + carona.destino + "\n"
                     + DataHoraUtil.exibir(carona.dataHora) + " · " + carona.vagas + " vaga(s) · " + carona.status);
             if (!"ENCERRADA".equals(carona.status)) {
@@ -204,22 +201,20 @@ public class HomeMotoristaActivity extends AppCompatActivity {
                 String nome = passageiro == null ? "Passageiro" : passageiro.nome;
                 TelaUi.adicionarLinha(this, lista, nome + " · solicitação " + pedido.status);
                 if ("PENDENTE".equals(pedido.status)) {
-                    AppCompatButton aceitarBtn = TelaUi.botao(this, lista, "Aceitar", () -> {
+                    TelaUi.botao(this, lista, "Aceitar", () -> {
                         if (solicitacoes.atualizarStatus(pedido.id, "ACEITA"))
                             Toast.makeText(this, "Solicitação aceita.", Toast.LENGTH_SHORT).show();
                         else Toast.makeText(this, "Sem vagas disponíveis ou solicitação já atualizada.", Toast.LENGTH_LONG).show();
                         carregarCaronas();
                     });
-                    AppCompatButton recusarBtn = TelaUi.botao(this, lista, "Recusar", () -> {
+                    TelaUi.botao(this, lista, "Recusar", () -> {
                         solicitacoes.atualizarStatus(pedido.id, "RECUSADA");
                         carregarCaronas();
                     });
-                    if (aceitarBtn == null || recusarBtn == null) {
-                        // Mantém referência limpa
-                    }
                 }
             }
         }
+        tvVazio.setVisibility(temCaronas ? View.GONE : View.VISIBLE);
     }
 
     private void sair() {
