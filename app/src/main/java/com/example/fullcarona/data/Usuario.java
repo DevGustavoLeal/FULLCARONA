@@ -12,7 +12,9 @@ public class Usuario {
     public String email;
     public String senhaHash;
     @Ignore public String senha;
+    public String instituicao;
     public String curso;
+    public String ra;
     /** MOTORISTA, PASSAGEIRO ou null enquanto não escolheu. */
     public String perfil;
 
