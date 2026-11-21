@@ -8,6 +8,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +23,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText edtEmail, edtSenha;
     private AppCompatButton btnEntrar;
     private TextView txtEsqueciSenha, txtCriarConta;
+    private ImageView btnToggleSenha;
+    private boolean senhaVisivel = false;
     private static final String PREFS = "fullcarona_prefs";
     private static final String KEY_EMAIL = "email";
 
@@ -34,11 +37,28 @@ public class LoginActivity extends AppCompatActivity {
         btnEntrar = findViewById(R.id.btnEntrar);
         txtEsqueciSenha = findViewById(R.id.txtEsqueciSenha);
         txtCriarConta = findViewById(R.id.txtCriarConta);
+        btnToggleSenha = findViewById(R.id.btnToggleSenha);
+
+        btnToggleSenha.setOnClickListener(v -> alternarVisibilidadeSenha());
+
         SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         edtEmail.setText(prefs.getString(KEY_EMAIL, ""));
         btnEntrar.setOnClickListener(v -> autenticar(prefs));
         txtCriarConta.setOnClickListener(v -> startActivity(new Intent(this, CriarContaActivity.class)));
         txtEsqueciSenha.setOnClickListener(v -> abrirRedefinicaoSenha());
+    }
+
+    private void alternarVisibilidadeSenha() {
+        if (senhaVisivel) {
+            edtSenha.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            btnToggleSenha.setImageResource(R.drawable.ic_eye_closed);
+            senhaVisivel = false;
+        } else {
+            edtSenha.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            btnToggleSenha.setImageResource(R.drawable.ic_eye_open);
+            senhaVisivel = true;
+        }
+        edtSenha.setSelection(edtSenha.getText().length());
     }
 
     private void autenticar(SharedPreferences prefs) {

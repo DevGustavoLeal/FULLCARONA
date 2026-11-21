@@ -151,7 +151,14 @@ public class HomeMotoristaActivity extends AppCompatActivity {
             return;
         }
 
-        String horario = DataHoraUtil.normalizar(dataHora.getText().toString());
+        String textoDataHora = dataHora.getText().toString().trim();
+        if (textoDataHora.isEmpty()) {
+            dataHora.setError("Selecione a data e hora");
+            Toast.makeText(this, "Por favor, selecione a data e hora da carona.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String horario = DataHoraUtil.normalizar(textoDataHora);
         int quantidade;
         try {
             quantidade = Integer.parseInt(vagas.getText().toString().trim());
@@ -160,8 +167,8 @@ public class HomeMotoristaActivity extends AppCompatActivity {
         }
 
         if (horario == null) {
-            dataHora.setError("Selecione uma data e hora válidas");
-            Toast.makeText(this, "Por favor, selecione a data e hora da carona.", Toast.LENGTH_SHORT).show();
+            dataHora.setError("Escolha um horário futuro");
+            Toast.makeText(this, "A data e hora da carona deve ser no futuro.", Toast.LENGTH_SHORT).show();
             return;
         }
         if (quantidade <= 0) {

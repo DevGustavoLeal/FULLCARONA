@@ -15,7 +15,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 @Database(entities = {Usuario.class, Endereco.class, Veiculo.class, Carona.class, Solicitacao.class},
-        version = 2, exportSchema = true)
+        version = 3, exportSchema = true)
 public abstract class AppDatabase extends RoomDatabase {
     private static volatile AppDatabase INSTANCE;
 
@@ -38,12 +38,26 @@ public abstract class AppDatabase extends RoomDatabase {
                                     super.onCreate(database);
                                     inserirDadosDeDemonstracao(database);
                                 }
+                                @Override public void onOpen(SupportSQLiteDatabase database) {
+                                    super.onOpen(database);
+                                    garantirDadosDeDemonstracao(database);
+                                }
                             })
                             .build();
                 }
             }
         }
         return INSTANCE;
+    }
+
+    private static void garantirDadosDeDemonstracao(SupportSQLiteDatabase db) {
+        try (android.database.Cursor cursor = db.query("SELECT COUNT(*) FROM usuarios")) {
+            if (cursor.moveToFirst() && cursor.getInt(0) == 0) {
+                inserirDadosDeDemonstracao(db);
+            }
+        } catch (RuntimeException e) {
+            Log.e("FullCarona", "Falha ao verificar dados de demonstração", e);
+        }
     }
 
     private static void inserirDadosDeDemonstracao(SupportSQLiteDatabase db) {
@@ -53,7 +67,9 @@ public abstract class AppDatabase extends RoomDatabase {
             motorista.put("nome", "Motorista Demonstração");
             motorista.put("email", "motorista@fullcarona.app");
             motorista.put("senhaHash", SenhaUtil.gerarHash("Motorista123"));
+            motorista.put("instituicao", "Fucapi");
             motorista.put("curso", "Engenharia");
+            motorista.put("ra", "2026001");
             motorista.put("perfil", "MOTORISTA");
             long motoristaId = db.insert("usuarios", SQLiteDatabase.CONFLICT_IGNORE, motorista);
 
@@ -61,7 +77,9 @@ public abstract class AppDatabase extends RoomDatabase {
             passageiro.put("nome", "Passageiro Demonstração");
             passageiro.put("email", "passageiro@fullcarona.app");
             passageiro.put("senhaHash", SenhaUtil.gerarHash("Passageiro123"));
+            passageiro.put("instituicao", "Fucapi");
             passageiro.put("curso", "Computação");
+            passageiro.put("ra", "2026002");
             passageiro.put("perfil", "PASSAGEIRO");
             db.insert("usuarios", SQLiteDatabase.CONFLICT_IGNORE, passageiro);
 

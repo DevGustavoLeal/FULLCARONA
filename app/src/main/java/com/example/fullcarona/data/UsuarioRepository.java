@@ -7,7 +7,7 @@ public class UsuarioRepository {
     public UsuarioRepository(AppDatabase db) { this.db = db; }
 
     public long cadastrar(Usuario usuario) {
-        if (usuario == null || vazio(usuario.nome) || vazio(usuario.email) || vazio(usuario.senha) || vazio(usuario.curso))
+        if (usuario == null || vazio(usuario.nome) || vazio(usuario.email) || vazio(usuario.senha) || vazio(usuario.instituicao) || vazio(usuario.curso) || vazio(usuario.ra))
             throw new IllegalArgumentException("Preencha todos os campos obrigatórios");
         usuario.email = usuario.email.trim().toLowerCase(java.util.Locale.ROOT);
         if (db.usuarioDao().emailExiste(usuario.email)) throw new IllegalArgumentException("Este e-mail já está cadastrado");
