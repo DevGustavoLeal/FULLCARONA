@@ -3,6 +3,7 @@ package com.example.fullcarona;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -17,12 +18,16 @@ import com.example.fullcarona.data.VeiculoRepository;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class CadastroVeiculoActivity extends AppCompatActivity {
     private long usuarioId;
     private EditText marca;
     private EditText placa;
     private EditText modeloAno;
+
+    private static final Pattern PADRAO_PLACA =
+            Pattern.compile("^[A-Z]{3}-?[0-9]{4}$|^[A-Z]{3}[0-9][A-Z][0-9]{2}$");
 
     private static final Map<String, String[]> MODELOS_POR_MARCA = new LinkedHashMap<>();
 
@@ -59,6 +64,10 @@ public class CadastroVeiculoActivity extends AppCompatActivity {
         marca.setOnClickListener(v -> selecionarMarca());
 
         placa = TelaUi.campo(this, root, "Placa (ABC-1234 ou ABC1D23)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        placa.setFilters(new InputFilter[]{
+                new InputFilter.AllCaps(),
+                new InputFilter.LengthFilter(8)
+        });
 
         modeloAno = TelaUi.campo(this, root, "Modelo / Ano (Toque para selecionar)", InputType.TYPE_NULL);
         modeloAno.setFocusable(false);
@@ -66,14 +75,27 @@ public class CadastroVeiculoActivity extends AppCompatActivity {
         modeloAno.setOnClickListener(v -> selecionarModeloEAno());
 
         TelaUi.botao(this, root, "Cadastrar veículo", () -> {
+            String marcaTexto = marca.getText().toString().trim();
+            String placaTexto = placa.getText().toString().trim().toUpperCase();
+            String modeloTexto = modeloAno.getText().toString().trim();
+
+            if (marcaTexto.isEmpty()) {
+                Toast.makeText(this, "Selecione a marca do veículo.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (!PADRAO_PLACA.matcher(placaTexto).matches()) {
+                placa.setError("Placa inválida. Use ABC-1234 ou ABC1D23");
+                placa.requestFocus();
+                return;
+            }
+            if (modeloTexto.isEmpty()) {
+                Toast.makeText(this, "Selecione o modelo e o ano.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             try {
                 new VeiculoRepository(AppDatabase.getInstance(this).veiculoDao())
-                        .salvar(new Veiculo(
-                                usuarioId,
-                                marca.getText().toString().trim(),
-                                placa.getText().toString().trim().toUpperCase(),
-                                modeloAno.getText().toString().trim()
-                        ));
+                        .salvar(new Veiculo(usuarioId, marcaTexto, placaTexto, modeloTexto));
                 startActivity(new Intent(this, HomeMotoristaActivity.class));
                 finish();
             } catch (IllegalArgumentException e) {
