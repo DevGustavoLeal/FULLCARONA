@@ -1,17 +1,15 @@
 package com.example.fullcarona;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputType;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
@@ -21,6 +19,8 @@ import com.example.fullcarona.data.CaronaRepository;
 import com.example.fullcarona.data.SolicitacaoRepository;
 import com.example.fullcarona.data.Usuario;
 
+import java.util.Locale;
+
 public class HomePassageiroActivity extends AppCompatActivity {
     private long usuarioId;
     private AppDatabase db;
@@ -28,6 +28,22 @@ public class HomePassageiroActivity extends AppCompatActivity {
     private SolicitacaoRepository solicitacoes;
     private EditText origemFiltro, destinoFiltro;
     private LinearLayout lista;
+
+    private static final String[] LOCAIS_FILTRO = {
+            "Todos os locais",
+            "FUCAPI - Unidade I",
+            "UFAM - Setor Norte",
+            "UEA - EST",
+            "Armando Mendes",
+            "São José",
+            "Terminal 1 (T1)",
+            "Terminal 3 (T3)",
+            "Terminal 4 (T4)",
+            "Amazonas Shopping",
+            "Manauara Shopping",
+            "Ponta Negra",
+            "Outro local (digitar)..."
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +61,18 @@ public class HomePassageiroActivity extends AppCompatActivity {
         solicitacoes = new SolicitacaoRepository(db);
 
         LinearLayout root = TelaUi.criar(this, "Caronas disponíveis", "Encontre uma carona e solicite sua vaga.");
-        origemFiltro = TelaUi.campo(this, root, "Filtrar por origem", InputType.TYPE_CLASS_TEXT);
-        destinoFiltro = TelaUi.campo(this, root, "Filtrar por destino", InputType.TYPE_CLASS_TEXT);
+        origemFiltro = TelaUi.campo(this, root, "Filtrar por origem (Toque para selecionar)", InputType.TYPE_NULL);
+        configurarSeletorFiltro(origemFiltro, "Filtrar por origem");
+
+        destinoFiltro = TelaUi.campo(this, root, "Filtrar por destino (Toque para selecionar)", InputType.TYPE_NULL);
+        configurarSeletorFiltro(destinoFiltro, "Filtrar por destino");
+
         TelaUi.botao(this, root, "Buscar", this::carregarCaronas);
+        TelaUi.botao(this, root, "Limpar filtros", () -> {
+            origemFiltro.setText("");
+            destinoFiltro.setText("");
+            carregarCaronas();
+        });
         TelaUi.botao(this, root, "Minhas caronas", () -> startActivity(new Intent(this, MinhasCaronasActivity.class)));
         TelaUi.botao(this, root, "Sair", this::sair);
 
@@ -59,19 +84,61 @@ public class HomePassageiroActivity extends AppCompatActivity {
         carregarCaronas();
     }
 
+    private void configurarSeletorFiltro(EditText campo, String titulo) {
+        campo.setFocusable(false);
+        campo.setClickable(true);
+        campo.setOnClickListener(v -> new AlertDialog.Builder(this)
+                .setTitle(titulo)
+                .setItems(LOCAIS_FILTRO, (dialog, which) -> {
+                    String escolhido = LOCAIS_FILTRO[which];
+                    if ("Todos os locais".equals(escolhido)) {
+                        campo.setText("");
+                        carregarCaronas();
+                    } else if (escolhido.startsWith("Outro local")) {
+                        pedirLocalManual(titulo, campo);
+                    } else {
+                        campo.setText(escolhido);
+                        carregarCaronas();
+                    }
+                })
+                .show());
+    }
+
+    private void pedirLocalManual(String titulo, EditText destinoCampo) {
+        EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        new AlertDialog.Builder(this)
+                .setTitle(titulo)
+                .setView(input)
+                .setPositiveButton("Confirmar", (dialog, which) -> {
+                    String texto = input.getText().toString().trim();
+                    destinoCampo.setText(texto);
+                    carregarCaronas();
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
     private void carregarCaronas() {
         if (lista == null) return;
         lista.removeAllViews();
-        String origem = origemFiltro.getText().toString().trim().toLowerCase(java.util.Locale.ROOT);
-        String destino = destinoFiltro.getText().toString().trim().toLowerCase(java.util.Locale.ROOT);
+        String origem = origemFiltro.getText().toString().trim().toLowerCase(Locale.ROOT);
+        String destino = destinoFiltro.getText().toString().trim().toLowerCase(Locale.ROOT);
         int count = 0;
         for (Carona carona : caronas.listarAbertas()) {
-            if (carona.motoristaId == usuarioId || !carona.origem.toLowerCase(java.util.Locale.ROOT).contains(origem)
-                    || !carona.destino.toLowerCase(java.util.Locale.ROOT).contains(destino)) continue;
+            if (carona.motoristaId == usuarioId
+                    || !carona.origem.toLowerCase(Locale.ROOT).contains(origem)
+                    || !carona.destino.toLowerCase(Locale.ROOT).contains(destino)) {
+                continue;
+            }
             Usuario motorista = db.usuarioDao().buscarPorId(carona.motoristaId);
             String nome = motorista == null ? "Motorista" : motorista.nome;
-            String texto = carona.origem + " → " + carona.destino + "\n" + DataHoraUtil.exibir(carona.dataHora)
-                    + " · " + carona.vagas + " vaga(s)\nMotorista: " + nome;
+            String valorTexto = carona.valor <= 0.0
+                    ? "Grátis"
+                    : String.format(Locale.getDefault(), "R$ %.2f", carona.valor);
+            String texto = carona.origem + " → " + carona.destino + "\n"
+                    + DataHoraUtil.exibir(carona.dataHora) + " · " + carona.vagas + " vaga(s) · " + valorTexto
+                    + "\nMotorista: " + nome;
             TelaUi.adicionarLinha(this, lista, texto);
             boolean jaSolicitou = solicitacoes.jaSolicitou(carona.id, usuarioId);
             TelaUi.botao(this, lista, jaSolicitou ? "Solicitação enviada" : "Solicitar carona", () -> {
