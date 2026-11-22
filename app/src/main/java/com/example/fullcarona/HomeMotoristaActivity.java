@@ -395,4 +395,22 @@ public class HomeMotoristaActivity extends AppCompatActivity {
                         carregarCaronas();
                     });
                     AppCompatButton recusarBtn = TelaUi.botao(this, lista, "Recusar", () -> {
-                        solicitacoes.atualizarStatus(pedido
+                        solicitacoes.atualizarStatus(pedido.id, "RECUSADA");
+                        carregarCaronas();
+                    });
+                    if (aceitarBtn == null || recusarBtn == null) {
+                        // Mantém referência limpa
+                    }
+                }
+            }
+        }
+    }
+
+    private void sair() {
+        new Sessao(this).sair();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
+}
