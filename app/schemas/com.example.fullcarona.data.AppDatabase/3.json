@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "c3a117a6fe22ff2eeaf8022414d625d8",
+    "identityHash": "dbb427e5a10b78faf55b8fba0c0eca2e",
     "entities": [
       {
         "tableName": "usuarios",
@@ -205,7 +205,7 @@
       },
       {
         "tableName": "caronas",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `motoristaId` INTEGER NOT NULL, `origem` TEXT, `destino` TEXT, `dataHora` TEXT, `vagas` INTEGER NOT NULL, `status` TEXT, FOREIGN KEY(`motoristaId`) REFERENCES `usuarios`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `motoristaId` INTEGER NOT NULL, `origem` TEXT, `destino` TEXT, `dataHora` TEXT, `vagas` INTEGER NOT NULL, `status` TEXT, `valor` REAL NOT NULL, `modalidade` TEXT, FOREIGN KEY(`motoristaId`) REFERENCES `usuarios`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -244,6 +244,17 @@
             "fieldPath": "status",
             "columnName": "status",
             "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "valor",
+            "columnName": "valor",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "modalidade",
+            "columnName": "modalidade",
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -261,24 +272,6 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_caronas_motoristaId` ON `${TABLE_NAME}` (`motoristaId`)"
-          },
-          {
-            "name": "index_caronas_status",
-            "unique": false,
-            "columnNames": [
-              "status"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_caronas_status` ON `${TABLE_NAME}` (`status`)"
-          },
-          {
-            "name": "index_caronas_dataHora",
-            "unique": false,
-            "columnNames": [
-              "dataHora"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_caronas_dataHora` ON `${TABLE_NAME}` (`dataHora`)"
           }
         ],
         "foreignKeys": [
@@ -387,7 +380,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c3a117a6fe22ff2eeaf8022414d625d8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dbb427e5a10b78faf55b8fba0c0eca2e')"
     ]
   }
 }
