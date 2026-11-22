@@ -2,6 +2,7 @@ package com.example.fullcarona.data;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
@@ -27,6 +28,7 @@ public class Carona {
     public double valor;
     public String modalidade;
 
+    @Ignore
     public Carona(long motoristaId, String origem, String destino, String dataHora, int vagas, String status) {
         this(motoristaId, origem, destino, dataHora, vagas, status, 0.0, "Carro");
     }
